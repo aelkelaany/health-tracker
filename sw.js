@@ -1,4 +1,4 @@
-const CACHE_NAME = 'health-tracker-v1';
+const CACHE_NAME = 'health-tracker-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -24,13 +24,16 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (!event.request.url.startsWith('http')) return;
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type === 'basic' || response.type === 'cors') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then(cache => {
+            try { cache.put(event.request, clone); } catch(e) {}
+          });
         }
         return response;
       }).catch(() => cached);
