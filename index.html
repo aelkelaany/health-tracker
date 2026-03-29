@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="صحتي">
+<meta name="theme-color" content="#4ecdc4">
+<meta name="description" content="تتبع تقدمك في الوزن والتغذية والتمارين">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<title>متابعة صحتي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg-primary: #0a0f1a;
+  --bg-card: linear-gradient(145deg, #141c2e 0%, #1a2540 100%);
+  --bg-deep: #0d1422;
+  --border: #1e2d4a;
+  --border-light: #2a3a5c;
+  --text-primary: #e0e7ef;
+  --text-secondary: #8a9ab5;
+  --text-muted: #5a6a8a;
+  --accent: #4ecdc4;
+  --accent-dark: #44b09e;
+  --warning: #ffd93d;
+  --danger: #ff6b6b;
+  --success: #4ecdc4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #101829 50%, #0d1422 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: 80px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #141c2e; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+.header {
+  padding: 20px 20px 12px;
+  padding-top: max(20px, env(safe-area-inset-top));
+  background: linear-gradient(180deg, rgba(78,205,196,0.08) 0%, transparent 100%);
+}
+.header h1 { font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 2px; }
+.header p { font-size: 13px; color: var(--text-muted); }
+
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(10,15,26,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border); display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.tab-btn {
+  background: none; border: none; color: var(--text-muted);
+  font-family: 'Tajawal', sans-serif; font-size: 11px; font-weight: 500;
+  cursor: pointer; padding: 6px 12px; border-radius: 12px;
+  transition: all 0.2s; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.tab-btn.active { color: var(--accent); }
+.tab-btn .icon { font-size: 22px; }
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px; margin-bottom: 12px;
+  animation: slideUp 0.4s ease-out;
+}
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.content { padding: 0 16px; }
+.page { display: none; animation: fadeIn 0.4s; }
+.page.active { display: block; }
+
+.btn {
+  border: none; border-radius: 12px; padding: 12px 24px;
+  font-family: 'Tajawal', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; display: inline-flex;
+  align-items: center; gap: 8px;
+}
+.btn-primary { background: linear-gradient(135deg, #4ecdc4, #44b09e); color: #0a0f1a; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; font-size: 13px; padding: 6px 12px; }
+.btn-full { width: 100%; justify-content: center; }
+
+input[type=number], input[type=date], select {
+  background: #141c2e; border: 1px solid var(--border-light); color: var(--text-primary);
+  padding: 12px 14px; border-radius: 10px; font-family: 'Tajawal', sans-serif;
+  font-size: 16px; outline: none; width: 100%; transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus { border-color: var(--accent); }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.metric-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px; text-align: center;
+}
+.metric-val { font-size: 26px; font-weight: 900; color: var(--accent); }
+.metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.progress-bar {
+  margin-top: 8px; height: 4px; background: var(--border);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; border-radius: 2px; transition: width 0.4s;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+}
+
+.check-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+  border-radius: 10px; cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.check-item:active { background: rgba(78,205,196,0.08); }
+.check-item.checked { opacity: 0.5; }
+.check-item.checked .item-text { text-decoration: line-through; }
+.checkbox {
+  width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--border-light);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all 0.2s; font-size: 13px; color: #0a0f1a; font-weight: 700;
+}
+.checkbox.on { background: var(--accent); border-color: var(--accent); }
+.item-text { font-size: 14px; line-height: 1.6; }
+
+.water-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.water-cup {
+  width: 100%; aspect-ratio: 1; border-radius: 10px; display: flex;
+  align-items: center; justify-content: center; font-size: 20px;
+  cursor: pointer; transition: all 0.15s; border: 2px solid var(--border-light);
+  background: transparent;
+}
+.water-cup.filled { background: rgba(78,205,196,0.2); border-color: var(--accent); }
+.water-cup:active { transform: scale(0.92); }
+
+.day-chips {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;
+  margin-bottom: 12px; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.day-chips::-webkit-scrollbar { display: none; }
+.day-chip {
+  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-light);
+  background: transparent; color: var(--text-secondary); font-family: 'Tajawal', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.day-chip.active { background: var(--accent); color: #0a0f1a; border-color: var(--accent); font-weight: 700; }
+
+.entry-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; background: var(--bg-deep); border-radius: 12px;
+  border: 1px solid var(--border); margin-bottom: 8px;
+}
+.entry-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+.entry-vals { display: flex; gap: 12px; flex-wrap: wrap; }
+.entry-vals span { font-size: 13px; }
+.entry-vals .lbl { color: var(--text-muted); }
+.entry-vals .val { font-weight: 700; color: var(--accent); }
+.diff-badge {
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-right: 4px;
+}
+.diff-good { color: var(--accent); background: rgba(78,205,196,0.1); }
+.diff-bad { color: var(--danger); background: rgba(255,107,107,0.1); }
+
+.meal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.meal-title { font-size: 15px; font-weight: 700; }
+.meal-count { font-size: 12px; color: var(--text-muted); }
+
+.exercise-plan-item {
+  padding: 12px 14px; background: var(--bg-deep); border-radius: 12px;
+  border: 1px solid var(--border); margin-bottom: 8px;
+}
+.exercise-plan-title { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+.exercise-plan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+
+.chart-container { position: relative; height: 220px; margin-top: 12px; }
+
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-title { font-size: 20px; font-weight: 800; }
+
+.ring-wrapper { position: relative; width: 140px; height: 140px; margin: 0 auto 12px; }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-val { font-size: 28px; font-weight: 900; color: var(--accent); }
+.ring-sub { font-size: 11px; color: var(--text-muted); }
+
+.warn-card { background: linear-gradient(145deg, #2a1515, #1a2540); border: 1px solid rgba(255,107,107,0.2); border-radius: 16px; padding: 20px; }
+.notes-card { background: linear-gradient(145deg, #1a2010, #1a2540); border: 1px solid rgba(78,205,196,0.15); border-radius: 16px; padding: 20px; }
+.warn-list { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+
+.compare-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; background: var(--bg-deep); border-radius: 10px; margin-bottom: 6px;
+}
+.compare-label { color: var(--text-secondary); font-size: 14px; }
+.compare-vals { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+
+.done-banner { text-align: center; padding: 24px; }
+.done-icon { font-size: 40px; margin-bottom: 8px; }
+.done-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.done-sub { font-size: 13px; color: var(--text-muted); }
+
+.compliance-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 12px; overflow: hidden; }
+.compliance-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+.empty-state { text-align: center; padding: 40px 20px; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.empty-desc { font-size: 14px; color: var(--text-muted); line-height: 1.8; }
+
+/* Install banner */
+.install-banner {
+  display: none; padding: 14px 20px; background: linear-gradient(135deg, rgba(78,205,196,0.15), rgba(68,176,158,0.1));
+  border-bottom: 1px solid rgba(78,205,196,0.2); align-items: center; justify-content: space-between; gap: 12px;
+}
+.install-banner.show { display: flex; }
+.install-banner p { font-size: 13px; color: var(--text-secondary); }
+.install-btn { background: var(--accent); color: #0a0f1a; border: none; padding: 8px 20px;
+  border-radius: 10px; font-family: 'Tajawal'; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.install-dismiss { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Install Banner -->
+<div class="install-banner" id="install-banner">
+  <p>📱 ثبّت التطبيق على جوالك</p>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="install-btn" id="install-btn">تثبيت</button>
+    <button class="install-dismiss" id="install-dismiss">✕</button>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>متابعة صحتي</h1>
+  <p>تتبع تقدمك في الوزن والتغذية والتمارين</p>
+</div>
+
+<div class="content">
+  <!-- ====== DASHBOARD ====== -->
+  <div id="page-dashboard" class="page active">
+    <div class="card" style="text-align:center">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">التقدم نحو الوزن المثالي (85.6 كجم)</div>
+      <div class="ring-wrapper">
+        <svg viewBox="0 0 100 100" style="transform:rotate(-90deg)" width="140" height="140">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#1e2d4a" stroke-width="8"/>
+          <circle id="progress-ring" cx="50" cy="50" r="42" fill="none" stroke="url(#ringGrad)" stroke-width="8" stroke-dasharray="0 264" stroke-linecap="round"/>
+          <defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4ecdc4"/><stop offset="100%" stop-color="#44b09e"/></linearGradient></defs>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-val" id="dash-progress-pct">0%</div>
+          <div class="ring-sub" id="dash-lost-text">ابدأ التسجيل</div>
+        </div>
+      </div>
+      <div style="font-size:14px;color:var(--text-secondary)">
+        الوزن الحالي: <span id="dash-current-weight" style="color:var(--text-primary);font-weight:700">—</span>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val" id="dash-water">0</div>
+        <div class="metric-label">أكواب ماء / 12</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="dash-water-bar" style="width:0%"></div></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="dash-meal-pct">0%</div>
+        <div class="metric-label">الالتزام اليوم</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="dash-meal-bar" style="width:0%;background:linear-gradient(90deg,#ffd93d,#ff6b6b)"></div></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="dash-exercise" style="font-size:22px">—</div>
+        <div class="metric-label">تمرين اليوم</div>
+      </div>
+    </div>
+
+    <div id="dash-weight-chart-card" class="card hidden">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">📉 تطور الوزن</h3>
+      <div class="chart-container"><canvas id="chart-weight"></canvas></div>
+    </div>
+    <div id="dash-bf-chart-card" class="card hidden">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">📊 دهون الجسم و BMI</h3>
+      <div class="chart-container"><canvas id="chart-bf-bmi"></canvas></div>
+    </div>
+    <div id="dash-water-chart-card" class="card hidden">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">💧 سجل شرب الماء</h3>
+      <div class="chart-container"><canvas id="chart-water"></canvas></div>
+    </div>
+    <div id="dash-empty" class="card">
+      <div class="empty-state">
+        <div class="empty-icon">🚀</div>
+        <div class="empty-title">ابدأ رحلتك!</div>
+        <div class="empty-desc">سجّل أول قياس من تبويب "القياسات" وابدأ بتتبع تقدمك</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== BODY ====== -->
+  <div id="page-body" class="page">
+    <div class="section-header">
+      <div class="section-title">⚖️ قياسات الجسم</div>
+      <button class="btn btn-primary" id="btn-toggle-body-form" onclick="toggleBodyForm()">＋ تسجيل قياس</button>
+    </div>
+    <div id="body-form-card" class="card hidden">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">تسجيل قياس جديد</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>التاريخ</label><input type="date" id="bf-date"></div>
+        <div class="form-group"><label>الوزن (كجم) *</label><input type="number" id="bf-weight" placeholder="119.1" step="0.1"></div>
+        <div class="form-group"><label>مؤشر BMI</label><input type="number" id="bf-bmi" placeholder="39.3" step="0.1"></div>
+        <div class="form-group"><label>كتلة الدهون (كجم)</label><input type="number" id="bf-fat" placeholder="45.2" step="0.1"></div>
+        <div class="form-group"><label>نسبة الدهون %</label><input type="number" id="bf-fatpct" placeholder="38.0" step="0.1"></div>
+        <div class="form-group"><label>الدهون الحشوية VFA</label><input type="number" id="bf-vfa" placeholder="289" step="1"></div>
+        <div class="form-group"><label>محيط البطن (سم)</label><input type="number" id="bf-waist" placeholder="125" step="0.1"></div>
+        <div class="form-group"><label>كتلة بدون دهون LBM</label><input type="number" id="bf-lbm" placeholder="73.9" step="0.1"></div>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="saveBodyEntry()">💾 حفظ القياس</button>
+    </div>
+    <div id="body-history"></div>
+    <div id="body-comparison" class="card hidden"></div>
+  </div>
+
+  <!-- ====== NUTRITION ====== -->
+  <div id="page-nutrition" class="page">
+    <div class="section-title" style="margin-bottom:12px">🥗 خطة التغذية</div>
+    <div class="day-chips" id="day-chips"></div>
+    <div class="card" style="text-align:center;padding:16px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:13px;color:var(--text-muted)">الالتزام اليوم</div>
+          <div id="compliance-pct" style="font-size:32px;font-weight:900;color:var(--accent)">0%</div></div>
+        <div id="compliance-count" style="font-size:13px;color:var(--text-muted)">0 / 0</div>
+      </div>
+      <div class="compliance-bar"><div class="compliance-fill" id="compliance-fill" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="font-size:16px;font-weight:700">💧 أكواب الماء</h3>
+        <span id="water-count" style="font-size:14px;color:var(--accent);font-weight:700">0 / 12</span>
+      </div>
+      <div class="water-grid" id="water-grid"></div>
+    </div>
+    <div id="meals-container"></div>
+    <div class="notes-card" style="margin-top:4px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;color:var(--warning)">📝 ملاحظات مهمة</h3>
+      <div class="warn-list">
+        <div>• يمكن استبدال الجبن بالبيض أو التونا أو المرتاديلا</div>
+        <div>• يمكن استبدال السمك باللحم أو الدجاج</div>
+        <div>• الشاي والقهوة مسموحة بدون سكر عادي</div>
+        <div>• تقليل الملح لمنع احتباس السوائل</div>
+        <div>• الوجبات الخفيفة اختيارية</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== EXERCISE ====== -->
+  <div id="page-exercise" class="page">
+    <div class="section-title" style="margin-bottom:12px">🏃 تمارين السير الكهربائي</div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-val" id="ex-week">0</div><div class="metric-label">أيام هذا الأسبوع</div></div>
+      <div class="metric-card"><div class="metric-val" id="ex-total">0</div><div class="metric-label">إجمالي الأيام</div></div>
+      <div class="metric-card"><div class="metric-val" id="ex-today" style="font-size:22px">❌</div><div class="metric-label">تمرين اليوم</div></div>
+    </div>
+    <div id="ex-form-card" class="card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">تسجيل تمرين اليوم</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div class="form-group"><label>المدة (دقيقة)</label><input type="number" id="ex-duration" placeholder="30"></div>
+        <div class="form-group"><label>السرعة (كم/س)</label><input type="number" id="ex-speed" placeholder="4.5" step="0.1"></div>
+        <div class="form-group"><label>الميلان %</label><input type="number" id="ex-incline" placeholder="2"></div>
+      </div>
+      <div class="check-item" style="margin-top:12px" onclick="toggleStretch()">
+        <div class="checkbox" id="ex-stretch-box"></div>
+        <span class="item-text">تمارين الإطالة بعد السير</span>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="saveExercise()">💪 تسجيل التمرين</button>
+    </div>
+    <div id="ex-done-card" class="card hidden" style="border-color:rgba(78,205,196,0.3)">
+      <div class="done-banner">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">تمرين اليوم مُنجز!</div>
+        <div class="done-sub" id="ex-done-details"></div>
+      </div>
+    </div>
+    <div id="ex-chart-card" class="card hidden">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">📈 سجل التمارين</h3>
+      <div class="chart-container"><canvas id="chart-exercise"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📋 خطة التمارين المُوصى بها</h3>
+      <div class="exercise-plan-item"><div class="exercise-plan-title">الأسبوع 1-2</div><div class="exercise-plan-grid"><div>المدة: 30 د</div><div>السرعة: 4.5 كم/س</div><div>الميلان: 2%</div><div>الحرق: 250-300</div></div></div>
+      <div class="exercise-plan-item"><div class="exercise-plan-title">الأسبوع 3-4</div><div class="exercise-plan-grid"><div>المدة: 35 د</div><div>السرعة: 5.0 كم/س</div><div>الميلان: 3%</div><div>الحرق: 330-380</div></div></div>
+      <div class="exercise-plan-item"><div class="exercise-plan-title">الأسبوع 5-8</div><div class="exercise-plan-grid"><div>المدة: 40 د</div><div>السرعة: 5.5 كم/س</div><div>الميلان: 4%</div><div>الحرق: 400-450</div></div></div>
+    </div>
+    <div class="warn-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;color:var(--danger)">⚠️ علامات تحذيرية — توقف فوراً</h3>
+      <div class="warn-list">
+        <div>• ألم حاد في الركبة (مش مجرد تعب)</div>
+        <div>• ألم يمتد من الظهر إلى الرجل</div>
+        <div>• دوخة أو ضيق تنفس شديد</div>
+        <div>• ألم في الصدر</div>
+        <div>• لا تجري — المشي السريع أفضل لمفاصلك</div>
+        <div>• لا ترفع الميلان فوق 6%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="dashboard"><span class="icon">📊</span><span>لوحة التحكم</span></button>
+  <button class="tab-btn" data-tab="body"><span class="icon">⚖️</span><span>القياسات</span></button>
+  <button class="tab-btn" data-tab="nutrition"><span class="icon">🥗</span><span>التغذية</span></button>
+  <button class="tab-btn" data-tab="exercise"><span class="icon">🏃</span><span>التمارين</span></button>
+</div>
+
+<script>
+/* ──── DATA ──── */
+const PLAN=[{day:"اليوم الأول",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج مشوي/مسلوق 250غم","شوربة خضار","10 ملاعق أرز"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["علبة تونة صغيرة 130غم","صحن سلطة 250غم"]}},{day:"اليوم الثاني",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج 200غم مشوي/مسلوق","10 ملاعق أرز"],snack2:["بسكويت ويفر","كوب قهوة"],dinner:["3 قطع جبن قليل الدسم 60غم","سلطة خضراء 250غم"]}},{day:"اليوم الثالث",meals:{breakfast:["كوب حليب صغير 300 مل","10 حبات توت","6 ملاعق كورن فليكس أو شوفان"],snack1:["شاي أو قهوة","ثمرة تفاح"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","لحم مشوي/مسلوق 100غم","شوربة خضار أو دايت","10 ملاعق أرز"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["2 بيضة مسلوقة","لبنة قليلة الدسم (ملعقتين)","خس 4 ورقات","10 حبات زيتون"]}},{day:"اليوم الرابع",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","دجاج مشوي 200غم","10 ملاعق أرز"],snack2:["مكسرات دايت (قبضة صغيرة)","شاي أو قهوة بدون سكر"],dinner:["سلطة خضراء","6 ملاعق فول","نصف رغيف خبز أسمر"]}},{day:"اليوم الخامس",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","سمك مشوي أو ستيك سمك 200غم","شوربة خضار","5 ملاعق أرز"],snack2:["صحن سلطة","شاي أو قهوة بدون سكر"],dinner:["نصف رغيف خبز أسمر","علبة تونة صغيرة","سلطة خضراء"]}},{day:"اليوم السادس",meals:{breakfast:["2 قطعة جبن قليل الدسم 80غم","3 شرائح لانشون/مرتاديلا","2 شريحة توست"],snack1:["كوب عصير فريش","مكسرات دايت (قبضة صغيرة)"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج مشوي/مسلوق 200غم"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["2 ملعقة لبنة قليلة الدسم","2 بيضة مسلوقة","خيارة"]}},{day:"اليوم السابع",meals:{breakfast:["3 شرائح مرتاديلا بقري 25غم","2 قطعة جبن قليل الدسم 40غم","2 شريحة شمام","كوب عصير"],snack1:["شاي أو قهوة بدون سكر","5 حبات زيتون دايت"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","دجاج مشوي مع أعشاب 250غم","شوربة عدس"],snack2:["برتقالة","نصف قطعة بسكويت ويفر"],dinner:["لبنة أو زبادي أو حمص (ملعقتين)","نصف رغيف خبز أسمر","صحن سلطة"]}}];
+const ML={breakfast:"🌅 الإفطار",snack1:"🍎 وجبة خفيفة (الضحى)",lunch:"🍽️ الغداء",snack2:"☕ وجبة خفيفة (العصر)",dinner:"🌙 العشاء"};
+
+/* ──── STORAGE ──── */
+const LS={
+  get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.error(e)}}
+};
+
+let bodyData=LS.get('ht-body')||[];
+let mealChecks=LS.get('ht-meals')||{};
+let waterLog=LS.get('ht-water')||{};
+let exerciseLog=LS.get('ht-exercise')||{};
+let activeDay=LS.get('ht-day')||0;
+let stretchOn=false;
+let charts={};
+
+function today(){return new Date().toISOString().split('T')[0]}
+
+/* ──── PWA ──── */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  document.getElementById('install-banner').classList.add('show');
+});
+document.getElementById('install-btn').addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const r=await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById('install-banner').classList.remove('show');
+});
+document.getElementById('install-dismiss').addEventListener('click',()=>{
+  document.getElementById('install-banner').classList.remove('show');
+});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.log('SW:',e));
+}
+
+/* ──── INIT ──── */
+function init(){
+  document.getElementById('bf-date').value=today();
+  setupTabs();setupDayChips();setupWaterGrid();renderAll();
+}
+
+/* ──── TABS ──── */
+function setupTabs(){
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('page-'+btn.dataset.tab).classList.add('active');
+      renderAll();
+    });
+  });
+}
+
+function renderAll(){renderDashboard();renderBodyHistory();renderNutrition();renderExercise()}
+
+/* ──── DASHBOARD ──── */
+function renderDashboard(){
+  const t=today(),latest=bodyData.length?bodyData[bodyData.length-1]:null;
+  const currentW=latest?latest.weight:119.1,target=85.6,totalToLose=119.1-target;
+  const lost=119.1-currentW,pct=Math.max(0,Math.min(100,Math.round((lost/totalToLose)*100)));
+  document.getElementById('progress-ring').setAttribute('stroke-dasharray',`${pct*2.64} 264`);
+  document.getElementById('dash-progress-pct').textContent=pct+'%';
+  document.getElementById('dash-lost-text').textContent=lost>0?`نقص ${lost.toFixed(1)} كجم`:'ابدأ التسجيل';
+  document.getElementById('dash-current-weight').textContent=latest?currentW+' كجم':'—';
+  const tw=waterLog[t]||0;
+  document.getElementById('dash-water').textContent=tw;
+  document.getElementById('dash-water-bar').style.width=Math.round((tw/12)*100)+'%';
+  const todayM=mealChecks[t]||{},plan=PLAN[activeDay];
+  const ti=Object.values(plan.meals).flat().length,ck=Object.keys(todayM).filter(k=>todayM[k]).length;
+  const mp=ti?Math.round((ck/ti)*100):0;
+  document.getElementById('dash-meal-pct').textContent=mp+'%';
+  document.getElementById('dash-meal-bar').style.width=mp+'%';
+  document.getElementById('dash-exercise').textContent=exerciseLog[t]?'✅':'—';
+  document.getElementById('dash-empty').classList.toggle('hidden',bodyData.length>0);
+  if(bodyData.length>1){
+    document.getElementById('dash-weight-chart-card').classList.remove('hidden');
+    rc('chart-weight','line',{labels:bodyData.map(d=>d.date.substring(5)),datasets:[{label:'الوزن',data:bodyData.map(d=>d.weight),borderColor:'#4ecdc4',backgroundColor:'rgba(78,205,196,0.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#4ecdc4',borderWidth:3}]},{scales:{y:{min:Math.min(...bodyData.map(d=>d.weight))-3}}});
+  }
+  const bf=bodyData.filter(d=>d.bodyFatPct||d.bmi);
+  if(bf.length>1){
+    document.getElementById('dash-bf-chart-card').classList.remove('hidden');
+    rc('chart-bf-bmi','line',{labels:bf.map(d=>d.date.substring(5)),datasets:[{label:'دهون %',data:bf.map(d=>d.bodyFatPct),borderColor:'#ffd93d',pointRadius:3,borderWidth:2,tension:.3},{label:'BMI',data:bf.map(d=>d.bmi),borderColor:'#ff6b6b',pointRadius:3,borderWidth:2,tension:.3}]});
+  }
+  const we=Object.entries(waterLog);
+  if(we.length>1){
+    document.getElementById('dash-water-chart-card').classList.remove('hidden');
+    const l14=we.slice(-14);
+    rc('chart-water','bar',{labels:l14.map(([d])=>d.substring(5)),datasets:[{label:'أكواب',data:l14.map(([,v])=>v),backgroundColor:'rgba(78,205,196,0.6)',borderRadius:6}]},{scales:{y:{max:14}}});
+  }
+}
+
+function rc(id,type,data,extra={}){
+  if(charts[id])charts[id].destroy();
+  const ctx=document.getElementById(id);if(!ctx)return;
+  charts[id]=new Chart(ctx,{type,data,options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#8a9ab5',font:{family:'Tajawal',size:11}}}},
+    scales:{x:{ticks:{color:'#5a6a8a',font:{family:'Tajawal',size:10}},grid:{color:'#1e2d4a'}},
+    y:{ticks:{color:'#5a6a8a',font:{family:'Tajawal',size:11}},grid:{color:'#1e2d4a'},...extra.scales?.y&&{min:extra.scales.y.min,max:extra.scales.y.max}}}}});
+}
+
+/* ──── BODY ──── */
+function toggleBodyForm(){
+  const c=document.getElementById('body-form-card');c.classList.toggle('hidden');
+  document.getElementById('btn-toggle-body-form').textContent=c.classList.contains('hidden')?'＋ تسجيل قياس':'✕ إغلاق';
+}
+function saveBodyEntry(){
+  const w=parseFloat(document.getElementById('bf-weight').value);
+  if(!w)return alert('الوزن مطلوب');
+  const e={date:document.getElementById('bf-date').value||today(),weight:w,
+    bmi:parseFloat(document.getElementById('bf-bmi').value)||null,
+    bodyFat:parseFloat(document.getElementById('bf-fat').value)||null,
+    bodyFatPct:parseFloat(document.getElementById('bf-fatpct').value)||null,
+    visceralFat:parseFloat(document.getElementById('bf-vfa').value)||null,
+    waist:parseFloat(document.getElementById('bf-waist').value)||null,
+    leanMass:parseFloat(document.getElementById('bf-lbm').value)||null};
+  bodyData=[...bodyData.filter(d=>d.date!==e.date),e].sort((a,b)=>a.date.localeCompare(b.date));
+  LS.set('ht-body',bodyData);
+  ['bf-weight','bf-bmi','bf-fat','bf-fatpct','bf-vfa','bf-waist','bf-lbm'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bf-date').value=today();toggleBodyForm();renderAll();
+}
+function renderBodyHistory(){
+  const c=document.getElementById('body-history');
+  if(!bodyData.length){c.innerHTML='';return}
+  const r=[...bodyData].reverse();
+  let h='<div class="card"><h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📋 سجل القياسات</h3>';
+  r.forEach((e,i)=>{
+    const pi=bodyData.length-1-i-1,prev=pi>=0?bodyData[pi]:null;
+    const diff=prev?(e.weight-prev.weight).toFixed(1):null;
+    const dc=diff!==null?(parseFloat(diff)<=0?'diff-good':'diff-bad'):'';
+    h+=`<div class="entry-row"><div style="flex:1"><div class="entry-meta">${e.date}</div><div class="entry-vals">
+      <span><span class="lbl">الوزن:</span> <span class="val">${e.weight}</span>${diff!==null?`<span class="diff-badge ${dc}">${diff>0?'+':''}${diff}</span>`:''}</span>
+      ${e.bmi?`<span><span class="lbl">BMI:</span> ${e.bmi}</span>`:''}
+      ${e.bodyFatPct?`<span><span class="lbl">دهون:</span> ${e.bodyFatPct}%</span>`:''}
+      ${e.visceralFat?`<span><span class="lbl">VFA:</span> ${e.visceralFat}</span>`:''}
+      ${e.waist?`<span><span class="lbl">بطن:</span> ${e.waist}سم</span>`:''}</div></div>
+      <button class="btn btn-danger" onclick="delBody('${e.date}')">🗑</button></div>`;
+  });
+  h+='</div>';c.innerHTML=h;
+  const comp=document.getElementById('body-comparison');
+  if(bodyData.length>=2){
+    const f=bodyData[0],l=bodyData[bodyData.length-1];
+    const flds=[{label:'الوزن',first:f.weight,last:l.weight,unit:'كجم'},{label:'BMI',first:f.bmi,last:l.bmi,unit:''},{label:'نسبة الدهون',first:f.bodyFatPct,last:l.bodyFatPct,unit:'%'},{label:'دهون حشوية',first:f.visceralFat,last:l.visceralFat,unit:''},{label:'محيط البطن',first:f.waist,last:l.waist,unit:'سم'}].filter(c=>c.first&&c.last);
+    if(flds.length){comp.classList.remove('hidden');
+      let ch='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📊 مقارنة: أول ← آخر قياس</h3>';
+      flds.forEach(c=>{const d=(c.last-c.first).toFixed(1),g=parseFloat(d)<=0;
+        ch+=`<div class="compare-row"><span class="compare-label">${c.label}</span><div class="compare-vals">
+        <span style="color:var(--text-muted)">${c.first}${c.unit}</span><span style="color:var(--text-muted)">←</span>
+        <span style="font-weight:700">${c.last}${c.unit}</span><span class="diff-badge ${g?'diff-good':'diff-bad'}">${d>0?'+':''}${d}</span></div></div>`;
+      });comp.innerHTML=ch;
+    }else comp.classList.add('hidden');
+  }else comp.classList.add('hidden');
+}
+function delBody(date){bodyData=bodyData.filter(d=>d.date!==date);LS.set('ht-body',bodyData);renderAll()}
+
+/* ──── NUTRITION ──── */
+function setupDayChips(){
+  document.getElementById('day-chips').innerHTML=PLAN.map((p,i)=>
+    `<button class="day-chip ${i===activeDay?'active':''}" onclick="switchDay(${i})">${p.day}</button>`).join('');
+}
+function switchDay(i){activeDay=i;LS.set('ht-day',i);setupDayChips();renderNutrition()}
+function setupWaterGrid(){
+  const g=document.getElementById('water-grid');g.innerHTML='';
+  for(let i=0;i<12;i++){const b=document.createElement('button');b.className='water-cup';b.textContent='○';b.onclick=()=>setWater(i);g.appendChild(b)}
+}
+function setWater(idx){const t=today(),cur=waterLog[t]||0;waterLog[t]=idx<cur?idx:idx+1;LS.set('ht-water',waterLog);renderNutrition();renderDashboard()}
+function renderWaterCups(){
+  const t=today(),cnt=waterLog[t]||0;document.getElementById('water-count').textContent=cnt+' / 12';
+  document.querySelectorAll('.water-cup').forEach((c,i)=>{c.classList.toggle('filled',i<cnt);c.textContent=i<cnt?'💧':'○'});
+}
+function toggleMealItem(mk,idx){
+  const t=today();if(!mealChecks[t])mealChecks[t]={};const k=`${mk}-${idx}`;
+  mealChecks[t][k]=!mealChecks[t][k];LS.set('ht-meals',mealChecks);renderNutrition();renderDashboard();
+}
+function renderNutrition(){
+  const t=today(),plan=PLAN[activeDay],tm=mealChecks[t]||{};
+  const ti=Object.values(plan.meals).flat().length,ck=Object.keys(tm).filter(k=>tm[k]).length;
+  const pct=ti?Math.round((ck/ti)*100):0;
+  const pe=document.getElementById('compliance-pct');pe.textContent=pct+'%';
+  pe.style.color=pct>=80?'var(--accent)':pct>=50?'var(--warning)':'var(--danger)';
+  document.getElementById('compliance-count').textContent=`${ck} / ${ti}`;
+  const fl=document.getElementById('compliance-fill');fl.style.width=pct+'%';
+  fl.style.background=pct>=80?'linear-gradient(90deg,var(--accent),var(--accent-dark))':pct>=50?'linear-gradient(90deg,#ffd93d,#f0c929)':'linear-gradient(90deg,#ff6b6b,#ee5a24)';
+  renderWaterCups();
+  const mc=document.getElementById('meals-container');let h='';
+  Object.entries(plan.meals).forEach(([mk,items])=>{
+    const mck=items.filter((_,idx)=>tm[`${mk}-${idx}`]).length,ad=mck===items.length;
+    h+=`<div class="card" style="border-color:${ad?'rgba(78,205,196,0.3)':'var(--border)'}">
+      <div class="meal-header"><span class="meal-title" style="color:${ad?'var(--accent)':'var(--text-primary)'}">${ML[mk]}</span>
+      <span class="meal-count">${mck}/${items.length}</span></div>`;
+    items.forEach((item,idx)=>{const ch=!!tm[`${mk}-${idx}`];
+      h+=`<div class="check-item ${ch?'checked':''}" onclick="toggleMealItem('${mk}',${idx})">
+        <div class="checkbox ${ch?'on':''}">${ch?'✓':''}</div><span class="item-text">${item}</span></div>`;
+    });h+='</div>';
+  });mc.innerHTML=h;
+}
+
+/* ──── EXERCISE ──── */
+function toggleStretch(){stretchOn=!stretchOn;const b=document.getElementById('ex-stretch-box');b.classList.toggle('on',stretchOn);b.textContent=stretchOn?'✓':''}
+function saveExercise(){
+  const dur=parseFloat(document.getElementById('ex-duration').value)||0;
+  if(!dur)return alert('المدة مطلوبة');
+  const spd=parseFloat(document.getElementById('ex-speed').value)||0,inc=parseFloat(document.getElementById('ex-incline').value)||0;
+  exerciseLog[today()]={duration:dur,speed:spd,incline:inc,stretching:stretchOn};
+  LS.set('ht-exercise',exerciseLog);
+  ['ex-duration','ex-speed','ex-incline'].forEach(id=>document.getElementById(id).value='');
+  stretchOn=false;document.getElementById('ex-stretch-box').classList.remove('on');document.getElementById('ex-stretch-box').textContent='';
+  renderExercise();renderDashboard();
+}
+function renderExercise(){
+  const t=today(),te=exerciseLog[t],td=Object.keys(exerciseLog).length;
+  const wd=Object.keys(exerciseLog).filter(d=>{const df=(new Date(t)-new Date(d))/(1e3*60*60*24);return df>=0&&df<7}).length;
+  document.getElementById('ex-week').textContent=wd;document.getElementById('ex-total').textContent=td;
+  document.getElementById('ex-today').textContent=te?'✅':'❌';
+  document.getElementById('ex-form-card').classList.toggle('hidden',!!te);
+  document.getElementById('ex-done-card').classList.toggle('hidden',!te);
+  if(te)document.getElementById('ex-done-details').textContent=`${te.duration} دقيقة • ${te.speed} كم/س • ميلان ${te.incline}%${te.stretching?' • + إطالة ✓':''}`;
+  const en=Object.entries(exerciseLog);
+  if(en.length>1){document.getElementById('ex-chart-card').classList.remove('hidden');const l14=en.slice(-14);
+    rc('chart-exercise','bar',{labels:l14.map(([d])=>d.substring(5)),datasets:[{label:'المدة (دقيقة)',data:l14.map(([,v])=>v.duration),backgroundColor:'rgba(78,205,196,0.6)',borderRadius:6}]});}
+}
+
+init();
+</script>
+</body>
+</html>
