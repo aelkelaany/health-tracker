@@ -420,11 +420,45 @@ input:focus, select:focus { border-color: var(--accent); }
   </div>
 </div>
 
+  <!-- ====== SETTINGS ====== -->
+  <div id="page-settings" class="page">
+    <div class="section-title" style="margin-bottom:12px">⚙️ الإعدادات والنسخ الاحتياطي</div>
+
+    <div class="card" style="border-color:rgba(78,205,196,0.3)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--accent)">💾 نسخ احتياطي</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.8">احفظ نسخة من بياناتك على جهازك. يُنصح بعمل نسخة احتياطية بعد كل تسجيل.</p>
+      <button class="btn btn-primary btn-full" onclick="exportData()">📤 تحميل نسخة احتياطية</button>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">📥 استعادة البيانات</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.8">استعد بياناتك من نسخة احتياطية سابقة.</p>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-ghost btn-full" onclick="document.getElementById('import-file').click()" style="background:rgba(78,205,196,0.1);color:var(--accent);border:1px solid rgba(78,205,196,0.2)">📂 اختر ملف النسخة الاحتياطية</button>
+    </div>
+
+    <div class="card" id="data-summary">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📊 ملخص البيانات المحفوظة</h3>
+      <div id="data-stats"></div>
+    </div>
+
+    <div class="warn-card" style="margin-top:12px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;color:var(--danger)">🗑 حذف جميع البيانات</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.8">تحذير: هذا الإجراء لا يمكن التراجع عنه.</p>
+      <button class="btn btn-danger btn-full" onclick="clearAllData()">حذف كل البيانات</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--accent);color:#0a0f1a;padding:12px 24px;border-radius:12px;font-family:'Tajawal';font-size:14px;font-weight:700;z-index:200;transition:transform 0.3s;pointer-events:none;"></div>
+
 <div class="tab-bar">
-  <button class="tab-btn active" data-tab="dashboard"><span class="icon">📊</span><span>لوحة التحكم</span></button>
+  <button class="tab-btn active" data-tab="dashboard"><span class="icon">📊</span><span>التحكم</span></button>
   <button class="tab-btn" data-tab="body"><span class="icon">⚖️</span><span>القياسات</span></button>
   <button class="tab-btn" data-tab="nutrition"><span class="icon">🥗</span><span>التغذية</span></button>
   <button class="tab-btn" data-tab="exercise"><span class="icon">🏃</span><span>التمارين</span></button>
+  <button class="tab-btn" data-tab="settings"><span class="icon">⚙️</span><span>إعدادات</span></button>
 </div>
 
 <script>
@@ -432,11 +466,81 @@ input:focus, select:focus { border-color: var(--accent); }
 const PLAN=[{day:"اليوم الأول",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج مشوي/مسلوق 250غم","شوربة خضار","10 ملاعق أرز"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["علبة تونة صغيرة 130غم","صحن سلطة 250غم"]}},{day:"اليوم الثاني",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج 200غم مشوي/مسلوق","10 ملاعق أرز"],snack2:["بسكويت ويفر","كوب قهوة"],dinner:["3 قطع جبن قليل الدسم 60غم","سلطة خضراء 250غم"]}},{day:"اليوم الثالث",meals:{breakfast:["كوب حليب صغير 300 مل","10 حبات توت","6 ملاعق كورن فليكس أو شوفان"],snack1:["شاي أو قهوة","ثمرة تفاح"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","لحم مشوي/مسلوق 100غم","شوربة خضار أو دايت","10 ملاعق أرز"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["2 بيضة مسلوقة","لبنة قليلة الدسم (ملعقتين)","خس 4 ورقات","10 حبات زيتون"]}},{day:"اليوم الرابع",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","دجاج مشوي 200غم","10 ملاعق أرز"],snack2:["مكسرات دايت (قبضة صغيرة)","شاي أو قهوة بدون سكر"],dinner:["سلطة خضراء","6 ملاعق فول","نصف رغيف خبز أسمر"]}},{day:"اليوم الخامس",meals:{breakfast:["2 بيضة مسلوقة","جبن قليل الدسم 40غم","رغيف خبز بني أو 2 توست","شرائح خيار وطماطم وخس"],snack1:["قطعة شوكولاتة","ثمرة فاكهة"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","سمك مشوي أو ستيك سمك 200غم","شوربة خضار","5 ملاعق أرز"],snack2:["صحن سلطة","شاي أو قهوة بدون سكر"],dinner:["نصف رغيف خبز أسمر","علبة تونة صغيرة","سلطة خضراء"]}},{day:"اليوم السادس",meals:{breakfast:["2 قطعة جبن قليل الدسم 80غم","3 شرائح لانشون/مرتاديلا","2 شريحة توست"],snack1:["كوب عصير فريش","مكسرات دايت (قبضة صغيرة)"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","صدر دجاج مشوي/مسلوق 200غم"],snack2:["قطعة شوكولاتة","ثمرة فاكهة"],dinner:["2 ملعقة لبنة قليلة الدسم","2 بيضة مسلوقة","خيارة"]}},{day:"اليوم السابع",meals:{breakfast:["3 شرائح مرتاديلا بقري 25غم","2 قطعة جبن قليل الدسم 40غم","2 شريحة شمام","كوب عصير"],snack1:["شاي أو قهوة بدون سكر","5 حبات زيتون دايت"],lunch:["كوبين ماء قبل الوجبة بنصف ساعة","سلطة خضراء (صحن متوسط)","دجاج مشوي مع أعشاب 250غم","شوربة عدس"],snack2:["برتقالة","نصف قطعة بسكويت ويفر"],dinner:["لبنة أو زبادي أو حمص (ملعقتين)","نصف رغيف خبز أسمر","صحن سلطة"]}}];
 const ML={breakfast:"🌅 الإفطار",snack1:"🍎 وجبة خفيفة (الضحى)",lunch:"🍽️ الغداء",snack2:"☕ وجبة خفيفة (العصر)",dinner:"🌙 العشاء"};
 
-/* ──── STORAGE ──── */
+/* ──── TOAST ──── */
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>{t.style.transform='translateX(-50%) translateY(-100px)'},2500);
+}
+
+/* ──── ENHANCED STORAGE WITH AUTO-BACKUP ──── */
 const LS={
   get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.error(e)}}
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));showToast('✅ تم الحفظ')}catch(e){console.error(e);showToast('❌ خطأ في الحفظ')}}
 };
+
+/* ──── BACKUP/RESTORE ──── */
+function exportData(){
+  const data={
+    version:2,
+    exportDate:new Date().toISOString(),
+    body:bodyData,
+    meals:mealChecks,
+    water:waterLog,
+    exercise:exerciseLog,
+    activeDay:activeDay
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`health-backup-${today()}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📤 تم تحميل النسخة الاحتياطية');
+}
+
+function importData(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.body) { bodyData=data.body; localStorage.setItem('ht-body',JSON.stringify(data.body)); }
+      if(data.meals) { mealChecks=data.meals; localStorage.setItem('ht-meals',JSON.stringify(data.meals)); }
+      if(data.water) { waterLog=data.water; localStorage.setItem('ht-water',JSON.stringify(data.water)); }
+      if(data.exercise) { exerciseLog=data.exercise; localStorage.setItem('ht-exercise',JSON.stringify(data.exercise)); }
+      if(data.activeDay!==undefined) { activeDay=data.activeDay; localStorage.setItem('ht-day',JSON.stringify(data.activeDay)); }
+      renderAll();renderSettings();
+      showToast('✅ تم استعادة البيانات بنجاح!');
+    }catch(err){ showToast('❌ ملف غير صالح'); }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function clearAllData(){
+  if(!confirm('هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.'))return;
+  if(!confirm('تأكيد أخير: سيتم حذف كل القياسات والوجبات والتمارين. متأكد؟'))return;
+  bodyData=[];mealChecks={};waterLog={};exerciseLog={};activeDay=0;
+  ['ht-body','ht-meals','ht-water','ht-exercise','ht-day'].forEach(k=>localStorage.removeItem(k));
+  renderAll();renderSettings();
+  showToast('🗑 تم حذف جميع البيانات');
+}
+
+function renderSettings(){
+  const stats=document.getElementById('data-stats');
+  if(!stats)return;
+  const bodyCount=bodyData.length;
+  const mealDays=Object.keys(mealChecks).length;
+  const waterDays=Object.keys(waterLog).length;
+  const exDays=Object.keys(exerciseLog).length;
+  stats.innerHTML=`
+    <div class="compare-row"><span class="compare-label">قياسات الجسم</span><span style="font-weight:700;color:var(--accent)">${bodyCount} قياس</span></div>
+    <div class="compare-row"><span class="compare-label">أيام تسجيل الوجبات</span><span style="font-weight:700;color:var(--accent)">${mealDays} يوم</span></div>
+    <div class="compare-row"><span class="compare-label">أيام تسجيل الماء</span><span style="font-weight:700;color:var(--accent)">${waterDays} يوم</span></div>
+    <div class="compare-row"><span class="compare-label">أيام التمارين</span><span style="font-weight:700;color:var(--accent)">${exDays} يوم</span></div>
+    <div class="compare-row"><span class="compare-label">آخر تحديث</span><span style="font-weight:700;color:var(--text-secondary)">${new Date().toLocaleDateString('ar-SA')}</span></div>`;
+}
 
 let bodyData=LS.get('ht-body')||[];
 let mealChecks=LS.get('ht-meals')||{};
@@ -487,7 +591,7 @@ function setupTabs(){
   });
 }
 
-function renderAll(){renderDashboard();renderBodyHistory();renderNutrition();renderExercise()}
+function renderAll(){renderDashboard();renderBodyHistory();renderNutrition();renderExercise();renderSettings()}
 
 /* ──── DASHBOARD ──── */
 function renderDashboard(){
