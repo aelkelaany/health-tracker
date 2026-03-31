@@ -1,37 +1,40 @@
-# متابعة صحتي — تطبيق PWA
+# صحتي+ — My Health Tracker PWA
 
-## الملفات
-- `index.html` — التطبيق الرئيسي
-- `manifest.json` — إعدادات التطبيق
-- `sw.js` — Service Worker للعمل بدون إنترنت
-- `icon-192.svg` — أيقونة التطبيق (صغيرة)
-- `icon-512.svg` — أيقونة التطبيق (كبيرة)
+## Setup on GitHub Pages (Free Hosting)
 
-## طريقة التشغيل على الجوال (مجاناً)
+1. Go to **github.com** → New Repository → name it `sihati-plus`
+2. Set it to **Public** → Create
+3. Click "uploading an existing file" → upload these files:
+   - `index.html`
+   - `manifest.json`
+   - `sw.js`
+   - `icon-192.svg`
+   - `icon-512.svg`
+4. Commit changes
+5. Go to **Settings → Pages** → select `main` branch → Save
+6. Your app URL: `https://YOUR_USERNAME.github.io/sihati-plus/`
 
-### الطريقة الأسهل: GitHub Pages
+## Install on Phone
 
-1. افتح https://github.com وسجّل حساب مجاني
-2. اضغط "New Repository"
-3. سمّ المستودع: `health-tracker`
-4. فعّل خيار "Public"
-5. اضغط "Create repository"
-6. اضغط "uploading an existing file"
-7. ارفع الملفات الخمسة كلها
-8. اضغط "Commit changes"
-9. روح Settings → Pages
-10. تحت Source اختر "main" واضغط Save
-11. انتظر دقيقة، رابط تطبيقك سيكون:
-    `https://اسم_حسابك.github.io/health-tracker/`
+**Android**: Open URL in Chrome → tap "Install" banner or Menu (⋮) → "Add to Home Screen"
 
-### تثبيت التطبيق على الجوال
+**iPhone**: Open URL in Safari → Share button (⬆️) → "Add to Home Screen"
 
-1. افتح الرابط في Chrome على جوالك
-2. سيظهر لك بانر "تثبيت التطبيق" — اضغط "تثبيت"
-3. أو: اضغط على القائمة (⋮) → "إضافة إلى الشاشة الرئيسية"
-4. التطبيق سيظهر على شاشتك مثل أي تطبيق عادي!
+## How to Import a Meal Plan
 
-### على iPhone:
-1. افتح الرابط في Safari
-2. اضغط على زر المشاركة (⬆️)
-3. اختر "إضافة إلى الشاشة الرئيسية"
+1. Upload your Dr. Nutrition .docx to Claude
+2. Claude converts it to a `.json` file
+3. In the app: tap **استيراد** (Import) → select the JSON file
+4. Your week's meals appear with checkboxes ready!
+
+## Files
+
+- `index.html` — Complete app (single file)
+- `manifest.json` — PWA metadata
+- `sw.js` — Service worker for offline support
+- `icon-192.svg` / `icon-512.svg` — App icons
+- `perfect-diet-week1.json` — Your first week's meal plan (import this!)
+
+## Backup
+
+Always tap **Settings → Backup** after logging data to save a JSON backup.

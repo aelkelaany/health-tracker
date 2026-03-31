@@ -1,13 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect width="192" height="192" rx="40" fill="#0a0f1a"/>
-  <rect x="8" y="8" width="176" height="176" rx="36" fill="url(#bg)" stroke="#1e2d4a" stroke-width="2"/>
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#141c2e"/>
-      <stop offset="100%" stop-color="#1a2540"/>
-    </linearGradient>
-  </defs>
-  <text x="96" y="78" text-anchor="middle" font-size="56" fill="#4ecdc4">⚖️</text>
-  <text x="96" y="125" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="28" fill="#4ecdc4">صحتي</text>
-  <text x="96" y="155" text-anchor="middle" font-family="sans-serif" font-weight="400" font-size="16" fill="#5a6a8a">متابعة</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#0d9488"/>
+  <text x="96" y="88" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="52" fill="#fff">صحتي</text>
+  <text x="96" y="130" text-anchor="middle" font-family="sans-serif" font-weight="400" font-size="28" fill="rgba(255,255,255,0.7)">+</text>
+  <circle cx="96" cy="155" r="8" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="96" cy="155" r="5" fill="#fff"/>
 </svg>

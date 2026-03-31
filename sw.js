@@ -1,10 +1,12 @@
-const CACHE_NAME = 'health-tracker-v3';
+const CACHE_NAME = 'sihati-plus-v1';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.svg',
-  './icon-512.svg'
+  './icon-512.svg',
+  'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
 ];
 
 self.addEventListener('install', event => {
@@ -26,19 +28,19 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = event.request.url;
   if (!url.startsWith('http')) return;
-  
+
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match('./index.html'))
     );
     return;
   }
-  
+
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
           try {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => {
