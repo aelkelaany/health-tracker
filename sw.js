@@ -1,10 +1,10 @@
-const CACHE_NAME = 'sihati-plus-v1';
+const CACHE_NAME = 'sihati-plus-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.svg',
-  './icon-512.svg',
+  './icon-192.png',
+  './icon-512.png',
   'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
 ];
@@ -49,10 +49,7 @@ self.addEventListener('fetch', event => {
           } catch(e) {}
         }
         return response;
-      }).catch(() => {
-        if (cached) return cached;
-        return new Response('Offline', { status: 503 });
-      });
+      }).catch(() => cached || new Response('Offline', { status: 503 }));
     })
   );
 });

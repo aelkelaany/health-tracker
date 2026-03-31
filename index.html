@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="صحتي+">
 <meta name="theme-color" content="#059669">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="icon-192.svg">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>صحتي+</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -593,7 +594,27 @@ if(tab==='progress')rCh();if(tab==='settings')rDSm();if(tab==='meals'){rDT('dt1'
 function rAll(){rWeekArea();rDT('dt1');rDT('dt2');uW();rMeals();rTM();rTW();rWF();rMs();rProf();rChal();document.getElementById('mot').innerHTML=gMot()}
 
 window.addEventListener('DOMContentLoaded',()=>{if(A.account.name){document.getElementById('welc').style.display='none';show()}});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW:',e))}
+
+// PWA INSTALL
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;showInstallBtn()});
+function showInstallBtn(){
+  if(document.getElementById('installBtn'))return;
+  const b=document.createElement('button');b.id='installBtn';
+  b.innerHTML='📲 تثبيت التطبيق — Install App';
+  b.style.cssText='position:fixed;bottom:calc(var(--nh) + 8px);left:50%;transform:translateX(-50%);z-index:99;padding:10px 20px;background:linear-gradient(135deg,var(--pri),var(--pri-d));color:#fff;border:none;border-radius:25px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(5,150,105,0.35);animation:sIn .5s ease';
+  b.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();const r=await deferredPrompt.userChoice;if(r.outcome==='accepted')toast('✅ تم التثبيت!');deferredPrompt=null;b.remove()};
+  document.body.appendChild(b);
+  setTimeout(()=>{if(b.parentNode)b.remove()},15000);
+}
+window.addEventListener('appinstalled',()=>{toast('✅ تم تثبيت التطبيق!');const b=document.getElementById('installBtn');if(b)b.remove()});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    console.log('SW registered');
+    reg.update();
+  }).catch(e=>console.log('SW:',e));
+}
 </script>
 </body>
 </html>
