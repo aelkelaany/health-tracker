@@ -264,6 +264,21 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 .del-wk-item .dates{font-size:9px;color:var(--txt3);margin-top:1px}
 .del-wk-btn{padding:5px 12px;border:1px solid rgba(220,38,38,0.2);border-radius:20px;background:none;color:var(--danger);font-family:inherit;font-size:10px;font-weight:600;cursor:pointer}
 .del-wk-btn:active{background:var(--danger);color:#fff}
+
+.m-state{display:flex;gap:3px;align-items:center}
+.m-st-btn{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--brd);background:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0}
+.m-st-btn.s-done{background:var(--ok);border-color:var(--ok);color:#fff}
+.m-st-btn.s-skip{background:var(--txt3);border-color:var(--txt3);color:#fff}
+.m-st-btn.s-swap{background:var(--warn);border-color:var(--warn);color:#fff}
+.m-st-btn.s-bad{background:var(--danger);border-color:var(--danger);color:#fff}
+.m-note{margin-top:4px;padding:6px 8px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:11px;width:100%;outline:none;background:var(--bg);color:var(--txt)}
+.m-note:focus{border-color:var(--pri)}
+.m-cal{display:inline-flex;align-items:center;gap:3px;margin-top:4px}
+.m-cal input{width:60px;padding:4px 6px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:11px;text-align:center;direction:ltr;outline:none;background:var(--bg)}
+.m-cal span{font-size:10px;color:var(--txt2)}
+.meal-skip-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--brd);border-radius:20px;background:none;font-family:inherit;font-size:10px;color:var(--txt2);cursor:pointer;margin-left:6px}
+.meal-skip-btn:active{background:var(--txt3);color:#fff}
+.meal-note-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--brd);border-radius:20px;background:none;font-family:inherit;font-size:10px;color:var(--txt2);cursor:pointer}
 </style>
 </head>
 <body>
@@ -282,7 +297,9 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="reg-row"><div><label class="reg-lb">الوزن المنشود / Target</label><input class="reg-in" id="rT" type="number" step="0.1" placeholder="85"></div>
 <div><label class="reg-lb">الوزن الحالي / Current</label><input class="reg-in" id="rC" type="number" step="0.1" placeholder="120"></div></div>
 <div class="reg-row"><div><label class="reg-lb">وحدة الوزن</label><div class="u-tog"><button class="u-btn active" onclick="sU('w','kg',this)">كجم kg</button><button class="u-btn" onclick="sU('w','lb',this)">باوند lb</button></div></div>
-<div><label class="reg-lb">وحدة الطول</label><div class="u-tog"><button class="u-btn active" onclick="sU('h','cm',this)">سم cm</button><button class="u-btn" onclick="sU('h','in',this)">إنش in</button></div></div></div></div>
+<div><label class="reg-lb">وحدة الطول</label><div class="u-tog"><button class="u-btn active" onclick="sU('h','cm',this)">سم cm</button><button class="u-btn" onclick="sU('h','in',this)">إنش in</button></div></div></div>
+<div class="reg-row"><div><label class="reg-lb">وحدة المياه / Water Unit</label><div class="u-tog"><button class="u-btn" onclick="sU('wt','cup',this)">كوب cup</button><button class="u-btn active" onclick="sU('wt','ml',this)">مل ml</button></div></div>
+<div><label class="reg-lb">هدف المياه اليومي</label><input class="reg-in" id="rWG" type="number" value="3000" placeholder="3000 ml"></div></div></div>
 <button class="reg-go" id="rBtn" onclick="doReg()" disabled>🚀 يلا نبدأ — Let's go!</button>
 </div></div>
 
@@ -317,7 +334,7 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="c w-sec">
 <div class="c-t">💧 متابعة الماء <span class="c-s">Water</span></div>
 <div class="w-rc" id="wrc"><svg class="w-svg" viewBox="0 0 170 170"><circle class="w-bg" cx="85" cy="85" r="70"/><circle class="w-fl" id="wrf" cx="85" cy="85" r="70" stroke-dasharray="439.82" stroke-dashoffset="439.82"/></svg>
-<div class="w-ctr"><div class="w-cnt" id="wC">0</div><div class="w-lbl">/ <span id="wT">12</span> أكواب</div></div></div>
+<div class="w-ctr"><div class="w-cnt" id="wC">0</div><div class="w-lbl">/ <span id="wT">3000</span> <span id="wU">ml</span></div></div></div>
 <div class="w-btns"><button class="w-b mn" onclick="adjW(-1)">-</button><button class="w-b" onclick="adjW(1)">+</button></div>
 <div id="wM" style="margin-top:8px;font-size:10px;color:var(--water);font-weight:600;min-height:14px"></div></div>
 
@@ -326,7 +343,8 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="c-t">🍽️ الوجبات <span class="c-s">Meals</span></div>
 <div id="tMS" style="margin-top:4px"></div>
 <div class="comp-bar"><div class="comp-fl" id="cFl" style="width:0%"></div></div>
-<div style="display:flex;justify-content:space-between;margin-top:3px"><span id="cTx" style="font-size:9px;color:var(--txt2)">0%</span><span style="font-size:9px;color:var(--pri);font-weight:600">التفاصيل ←</span></div></div>
+<div style="display:flex;justify-content:space-between;margin-top:3px"><span id="cTx" style="font-size:9px;color:var(--txt2)">0%</span><span style="font-size:9px;color:var(--pri);font-weight:600">التفاصيل ←</span></div>
+<div id="calSummary" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--brd);font-size:11px;color:var(--txt2)"></div></div>
 
 <!-- WORKOUT SUM -->
 <div class="c" onclick="sTab('workout')" style="cursor:pointer">
@@ -372,6 +390,7 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="mo-f"><label>اسم الأسبوع / Label</label><input type="text" id="awL" placeholder="الأسبوع الثاني"></div>
 <div class="mo-f"><label>تاريخ البداية / Start Date</label><input type="date" id="awD"></div>
 <div class="mo-f"><label>هدف الماء / Water Target</label><input type="number" id="awW" value="12" min="1"></div>
+<div class="mo-f"><label>السعرات اليومية / Daily Calories</label><input type="number" id="awCal" value="1800" min="500" max="5000"></div>
 <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--brd)">
 <div style="font-size:11px;font-weight:700;margin-bottom:3px">📥 استيراد الوجبات (اختياري)</div>
 <div class="fd" id="awFD" onclick="document.getElementById('awFI').click()"><div class="fd-ic">📄</div><div class="fd-tx" id="awFS">اضغط لاختيار JSON</div></div>
@@ -384,6 +403,7 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="mo-f"><label>الاسم</label><input type="text" id="epN"></div>
 <div class="mo-f"><label>تاريخ الميلاد</label><input type="date" id="epD"></div>
 <div class="mo-f"><label>الطول</label><input type="number" step="0.1" id="epH"></div>
+<div class="mo-f"><label>وحدة المياه</label><select id="epWU" style="width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:13px;background:var(--bg)"><option value="ml">مل ml</option><option value="cup">كوب cup</option></select></div>
 <div class="mo-f"><label>الوزن الحالي</label><input type="number" step="0.1" id="epC"></div>
 <div class="mo-f"><label>الوزن المنشود</label><input type="number" step="0.1" id="epT"></div>
 <button class="mo-go" onclick="svProf()">✅ حفظ</button><button class="mo-cl" onclick="clEP()">إغلاق</button></div></div>
@@ -409,7 +429,7 @@ const AD=['الأحد','الإثنين','الثلاثاء','الأربعاء','�
 const ML={breakfast:{a:'الإفطار',e:'Breakfast',i:'🍳'},snack1:{a:'وجبة خفيفة',e:'AM Snack',i:'🍎'},lunch:{a:'الغداء',e:'Lunch',i:'🍛'},snack2:{a:'وجبة خفيفة',e:'PM Snack',i:'🍫'},dinner:{a:'العشاء',e:'Dinner',i:'🥪'}};
 const MOT={m:["صباح الخير يا {n}! يوم جديد 🌟","كل خطوة تقربك من هدفك 💪","ابدأ يومك بكوب ماء 💧","النتائج تأتي مع الاستمرار 🎯"],a:["أحسنت يا {n}! كمّل 🔥","نص اليوم عدّى، شربت مائك؟ 💧","الالتزام سر النجاح 👍","كل وجبة صحية = خطوة 🏆"],e:["يوم ممتاز يا {n}! 🏆","أنت أقوى مما تتخيل 🌟","ارتاح الليلة، بكرة نكمّل 🌙","تمرين اليوم خلاك أقوى 💪"],wd:["ممتاز! هدف الماء محقق 🎉"],wl:["باقي {r} كوب ماء! 💧"],f:["أهلاً يا {n}! أضف أول أسبوع 🚀"]};
 
-let rU={w:'kg',h:'cm'},awI=null;
+let rU={w:'kg',h:'cm',wt:'ml'},awI=null;
 function dd(){return{account:{name:'',dob:'',height:0,target_weight:0,current_weight:0,weight_unit:'kg',height_unit:'cm',created_at:''},weeks:[],currentWeekId:null,currentDayIndex:0}}
 function ld(){try{const r=localStorage.getItem(SK);if(!r)return dd();const d=JSON.parse(r);if(!d.account)d.account={};if(!d.weeks)d.weeks=[];return d}catch(e){return dd()}}
 function sv(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){toast('خطأ في الحفظ')}}
@@ -429,15 +449,15 @@ function wMsg(c,t){const p=c/t;if(!c)return"ابدأ بكوب ماء! 💧";if(p
 function sU(t,v,b){rU[t]=v;b.parentElement.querySelectorAll('.u-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active')}
 document.getElementById('rN').addEventListener('input',()=>{document.getElementById('rBtn').disabled=document.getElementById('rN').value.trim().length<2});
 function doReg(){const n=document.getElementById('rN').value.trim();if(n.length<2)return;
-A.account={name:n,dob:document.getElementById('rD').value||'',height:parseFloat(document.getElementById('rH').value)||0,target_weight:parseFloat(document.getElementById('rT').value)||0,current_weight:parseFloat(document.getElementById('rC').value)||0,weight_unit:rU.w,height_unit:rU.h,created_at:new Date().toISOString()};
+A.account={name:n,dob:document.getElementById('rD').value||'',height:parseFloat(document.getElementById('rH').value)||0,target_weight:parseFloat(document.getElementById('rT').value)||0,current_weight:parseFloat(document.getElementById('rC').value)||0,weight_unit:rU.w,height_unit:rU.h,water_unit:rU.wt||'ml',water_daily_goal:parseInt(document.getElementById('rWG').value)||3000,created_at:new Date().toISOString()};
 sv(A);document.getElementById('welc').classList.add('hide');setTimeout(()=>{document.getElementById('welc').style.display='none';show()},500)}
 
 // EDIT PROFILE
-function openEditProf(){const a=A.account;document.getElementById('epN').value=a.name||'';document.getElementById('epD').value=a.dob||'';document.getElementById('epH').value=a.height||'';document.getElementById('epC').value=a.current_weight||'';document.getElementById('epT').value=a.target_weight||'';document.getElementById('epM').classList.add('show')}
+function openEditProf(){const a=A.account;document.getElementById('epN').value=a.name||'';document.getElementById('epD').value=a.dob||'';document.getElementById('epH').value=a.height||'';document.getElementById('epC').value=a.current_weight||'';document.getElementById('epT').value=a.target_weight||'';document.getElementById('epWU').value=a.water_unit||'ml';document.getElementById('epM').classList.add('show')}
 function clEP(){document.getElementById('epM').classList.remove('show')}
-function svProf(){A.account.name=document.getElementById('epN').value.trim()||A.account.name;A.account.dob=document.getElementById('epD').value;A.account.height=parseFloat(document.getElementById('epH').value)||0;A.account.current_weight=parseFloat(document.getElementById('epC').value)||0;A.account.target_weight=parseFloat(document.getElementById('epT').value)||0;sv(A);clEP();updH();rAll();toast('✅ تم حفظ الملف')}
+function svProf(){A.account.name=document.getElementById('epN').value.trim()||A.account.name;A.account.dob=document.getElementById('epD').value;A.account.height=parseFloat(document.getElementById('epH').value)||0;A.account.current_weight=parseFloat(document.getElementById('epC').value)||0;A.account.target_weight=parseFloat(document.getElementById('epT').value)||0;A.account.water_unit=document.getElementById('epWU').value||'ml';sv(A);clEP();updH();rAll();toast('✅ تم حفظ الملف')}
 
-function show(){document.getElementById('hdr').style.display='flex';document.getElementById('main').style.display='block';document.getElementById('nav').style.display='flex';updH();rWS();rAll()}
+function show(){document.getElementById('hdr').style.display='flex';document.getElementById('main').style.display='block';document.getElementById('nav').style.display='flex';updH();rAll()}
 function updH(){const hr=new Date().getHours();const g=hr<12?'صباح الخير':hr<17?'مساء الخير':'مساء النور';
 document.getElementById('hG').innerHTML=g+'، <b>'+A.account.name+'</b>';
 document.getElementById('hD').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'short',day:'numeric'});
@@ -469,14 +489,14 @@ else badge='<div class="ch-badge" style="background:var(--pri-l);color:var(--pri
 cc.innerHTML='<div class="ch-bar-wrap"><div class="ch-bar" style="width:'+pct+'%;background:'+barColor+'"></div></div><div class="ch-stats"><span>البداية: '+start+' '+wu+'</span><span>الهدف: '+tgt+' '+wu+'</span></div><div class="ch-stats" style="margin-top:4px"><span>نزلت: '+lost.toFixed(1)+' '+wu+'</span><span>باقي: '+remain.toFixed(1)+' '+wu+'</span></div><div style="text-align:center">'+badge+'</div>'}
 
 // WEEK
-function mkW(lbl,sd,wt,imp){const id='w_'+Date.now();const dl=['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع'];const days=[];const s=new Date(sd);
+function mkW(lbl,sd,wt,cal,imp){const id='w_'+Date.now();const dl=['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع'];const days=[];const s=new Date(sd);
 for(let i=0;i<7;i++){const dd=new Date(s);dd.setDate(s.getDate()+i);const ds=dd.toISOString().split('T')[0];
 let meals={breakfast:{items:[],optional:false},snack1:{items:[],optional:true},lunch:{items:[],optional:false},snack2:{items:[],optional:true},dinner:{items:[],optional:false}};
-if(imp?.days?.[i]?.meals){const im=imp.days[i].meals;['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{if(im[k])meals[k]={items:(im[k].items||[]).map(it=>typeof it==='string'?{name:it,checked:false}:{name:it.name||it,checked:false}),optional:im[k].optional||false}})}
+if(imp?.days?.[i]?.meals){const im=imp.days[i].meals;['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{if(im[k])meals[k]={items:(im[k].items||[]).map(it=>typeof it==='string'?{name:it,status:'',swap_note:'',calories:0}:{name:it.name||it,status:'',swap_note:'',calories:0}),optional:im[k].optional||false}})}
 days.push({day_number:i+1,label:imp?.days?.[i]?.label||('اليوم '+dl[i]),date:ds,water:{cups:0},meals,workout:{treadmill:{duration:0,speed:0,incline:0,distance:0},exercises:[]}})}
-return{id,label:lbl||'أسبوع جديد',start_date:sd,water_target:wt||12,measurements:{weight:null,body_fat:null,muscle:null},days}}
+return{id,label:lbl||'أسبوع جديد',start_date:sd,water_target:wt||12,daily_calories:cal||1800,measurements:{weight:null,body_fat:null,muscle:null},days}}
 
-function rWS(){const s=document.getElementById('weekSel');s.innerHTML='';if(!A.weeks.length){s.innerHTML='<option value="">لا توجد أسابيع</option>';return}
+function rWS(){const s=document.getElementById('weekSel');if(!s)return;s.innerHTML='';if(!A.weeks.length){s.innerHTML='<option value="">لا توجد أسابيع</option>';return}
 A.weeks.forEach(w=>{const o=document.createElement('option');o.value=w.id;o.textContent=w.label+(w.start_date?' ('+adn(w.start_date)+' '+w.start_date+')':'');if(w.id===A.currentWeekId)o.selected=true;s.appendChild(o)})}
 function swW(v){A.currentWeekId=v;A.currentDayIndex=0;sv(A);rAll()}
 
@@ -508,7 +528,7 @@ const awd=document.getElementById('awFD');
 ['dragenter','dragover'].forEach(e=>awd.addEventListener(e,ev=>{ev.preventDefault();awd.classList.add('dov')}));
 ['dragleave','drop'].forEach(e=>awd.addEventListener(e,ev=>{ev.preventDefault();awd.classList.remove('dov')}));
 awd.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f){const dt=new DataTransfer();dt.items.add(f);const inp=document.getElementById('awFI');inp.files=dt.files;hAWF({target:inp})}});
-function doAW(){const w=mkW(document.getElementById('awL').value.trim(),document.getElementById('awD').value||ts(),parseInt(document.getElementById('awW').value)||12,awI);A.weeks.push(w);A.currentWeekId=w.id;A.currentDayIndex=0;sv(A);clAW();toast(awI?'✅ تم الإنشاء مع الخطة!':'✅ تم الإنشاء!');rWS();rAll()}
+function doAW(){const w=mkW(document.getElementById('awL').value.trim(),document.getElementById('awD').value||ts(),parseInt(document.getElementById('awW').value)||12,parseInt(document.getElementById('awCal').value)||1800,awI);A.weeks.push(w);A.currentWeekId=w.id;A.currentDayIndex=0;sv(A);clAW();toast(awI?'✅ تم الإنشاء مع الخطة!':'✅ تم الإنشاء!');rWS();rAll()}
 
 // DELETE WEEK MODAL
 function openDelWk(){const c=document.getElementById('dwList');
@@ -520,26 +540,85 @@ function doDel(id){if(!confirm('حذف هذا الأسبوع؟'))return;A.weeks=
 
 // WATER
 function adjW(d){const day=gd();if(!day){toast('أضف أسبوع أولاً');return}if(!day.water)day.water={cups:0};day.water.cups=Math.max(0,(day.water.cups||0)+d);sv(A);uW();
-const c=document.getElementById('wrc');c.classList.remove('spl');void c.offsetWidth;c.classList.add('spl');if(d>0)toast('💧 +1 كوب')}
-function uW(){const d=gd(),w=gw();const c=d?.water?.cups||0,t=w?.water_target||12;const p=Math.min(c/t,1),ci=2*Math.PI*70;
-document.getElementById('wC').textContent=c;document.getElementById('wT').textContent=t;document.getElementById('wrf').style.strokeDashoffset=ci*(1-p);document.getElementById('wM').innerHTML=wMsg(c,t)}
+const c=document.getElementById('wrc');c.classList.remove('spl');void c.offsetWidth;c.classList.add('spl');if(d>0){const wu=A.account.water_unit||'ml';toast('💧 +'+(wu==='ml'?'250ml':'1 كوب'))}}
+function getWaterDisplay(cups,target){
+const wu=A.account.water_unit||'ml';
+if(wu==='ml')return{current:cups*250,target:target*250,unit:'ml'};
+return{current:cups,target:target,unit:'كوب'};
+}
+function uW(){const d=gd(),w=gw();const cups=d?.water?.cups||0,t=w?.water_target||12;
+const wd=getWaterDisplay(cups,t);
+const p=Math.min(cups/t,1),ci=2*Math.PI*70;
+document.getElementById('wC').textContent=wd.current;document.getElementById('wT').textContent=wd.target;
+document.getElementById('wU').textContent=wd.unit;
+document.getElementById('wrf').style.strokeDashoffset=ci*(1-p);document.getElementById('wM').innerHTML=wMsg(cups,t)}
 
 // MEALS
-function rMeals(){const c=document.getElementById('mC');const d=gd();
-if(!d?.meals){c.innerHTML='<div class="empty"><div class="empty-ic">📥</div><div class="empty-tx">لا توجد خطة</div><button class="empty-btn" onclick="openAW()">+ أسبوع</button></div>';return}
-let h='';['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{const m=d.meals[k];if(!m)return;const info=ML[k];const items=m.items||[];const cc=items.filter(i=>i.checked).length;
-let dots='';items.forEach(i=>{dots+='<span class="dot'+(i.checked?' ok':'')+'"></span>'});
-let ih='';items.forEach((it,idx)=>{ih+='<div class="m-i'+(it.checked?' done':'')+'"><button class="m-chk'+(it.checked?' on':'')+'" onclick="tM(\''+k+'\','+idx+')">&#x2713;</button><span class="m-txt">'+it.name+'</span></div>'});
-h+='<div class="ms"><div class="ms-h"><h3>'+info.i+' '+info.a+' <span class="c-s">'+info.e+'</span></h3><div style="display:flex;align-items:center;gap:5px">'+(m.optional?'<span class="bdg opt">اختيارية</span>':'')+'<span class="bdg">'+cc+'/'+items.length+'</span><div class="pdots">'+dots+'</div></div></div><div class="m-items">'+(items.length?ih:'<div style="padding:4px;color:var(--txt3);font-size:10px">لا توجد</div>')+'</div></div>'});
-c.innerHTML=h;uComp()}
-function tM(k,i){const d=gd();if(!d?.meals?.[k])return;const it=d.meals[k].items[i];if(!it)return;it.checked=!it.checked;sv(A);rMeals();rTM();if(it.checked)toast('✅ '+it.name)}
-function rTM(){const d=gd(),c=document.getElementById('tMS');
-if(!d?.meals){c.innerHTML='';document.getElementById('cFl').style.width='0%';document.getElementById('cTx').textContent='0%';return}
-let tot=0,chk=0;let h='<div style="display:flex;gap:4px;flex-wrap:wrap">';
-['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{const m=d.meals[k];if(!m)return;const items=m.items||[];const ch=items.filter(i=>i.checked).length;tot+=items.length;chk+=ch;const dn=ch===items.length&&items.length>0;
-h+='<span style="padding:2px 6px;border-radius:20px;font-size:9px;font-weight:600;background:'+(dn?'var(--gym-l)':'var(--bg)')+';color:'+(dn?'var(--ok)':'var(--txt3)')+'">'+ML[k].i+' '+ch+'/'+items.length+'</span>'});
-h+='</div>';c.innerHTML=h;uComp()}
-function uComp(){const d=gd();if(!d?.meals)return;let t=0,c=0;['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{(d.meals[k]?.items||[]).forEach(i=>{t++;if(i.checked)c++})});const p=t>0?Math.round((c/t)*100):0;document.getElementById('cFl').style.width=p+'%';document.getElementById('cTx').textContent=p+'% التزام'}
+function stLabel(st){if(st==='done')return'✅';if(st==='skip')return'⏭️';if(st==='swap')return'🔄';if(st==='bad')return'❌';return'○'}
+function stClass(st){if(st==='done')return's-done';if(st==='skip')return's-skip';if(st==='swap')return's-swap';if(st==='bad')return's-bad';return''}
+function stPoints(st){if(st==='done')return 100;if(st==='skip')return 70;if(st==='swap')return 80;return 0}
+function nextSt(st){const cy=['','done','swap','skip','bad'];const i=cy.indexOf(st||'');return cy[(i+1)%cy.length]}
+
+function rMeals(){const el=document.getElementById('mC');const d=gd();
+if(!d||!d.meals){el.innerHTML='<div class="empty"><div class="empty-ic">📥</div><div class="empty-tx">لا توجد خطة</div><button class="empty-btn" onclick="openAW()">+ أسبوع</button></div>';return}
+var h='';var mkeys=['breakfast','snack1','lunch','snack2','dinner'];
+for(var mi=0;mi<mkeys.length;mi++){var k=mkeys[mi];var m=d.meals[k];if(!m)continue;var info=ML[k];var items=m.items||[];
+var cc=0;for(var j=0;j<items.length;j++){if(items[j].status&&items[j].status!=='')cc++}
+var dots='';for(var j=0;j<items.length;j++){var st=items[j].status||'';dots+='<span class="dot'+((st==='done'||st==='swap'||st==='skip')?' ok':'')+'"></span>'}
+var ih='';for(var j=0;j<items.length;j++){var it=items[j];var st=it.status||'';var cls=stClass(st);var striked=(st==='done'||st==='skip');
+ih+='<div class="m-i'+(striked?' done':'')+'"><button class="m-st-btn '+cls+'" onclick="tM(\''+k+'\','+j+')">'+stLabel(st)+'</button><div style="flex:1"><span class="m-txt">'+it.name+'</span>';
+if(st==='swap'){ih+='<div class="m-cal"><input type="text" placeholder="البديل" value="'+(it.swap_note||'')+'" onchange="mNote(\''+k+'\','+j+',\'swap_note\',this.value)"><input type="number" placeholder="cal" value="'+(it.calories||'')+'" onchange="mNote(\''+k+'\','+j+',\'calories\',this.value)" style="width:50px"><span>سعرة</span></div>'}
+if(st==='bad'){ih+='<div class="m-cal"><input type="text" placeholder="إيش أكلت؟" value="'+(it.swap_note||'')+'" onchange="mNote(\''+k+'\','+j+',\'swap_note\',this.value)"><input type="number" placeholder="cal" value="'+(it.calories||'')+'" onchange="mNote(\''+k+'\','+j+',\'calories\',this.value)" style="width:50px"><span>سعرة</span></div>'}
+ih+='</div></div>'}
+h+='<div class="ms"><div class="ms-h"><h3>'+info.i+' '+info.a+' <span class="c-s">'+info.e+'</span></h3><div style="display:flex;align-items:center;gap:5px">'+(m.optional?'<span class="bdg opt">اختيارية</span>':'')+'<span class="bdg">'+cc+'/'+items.length+'</span><div class="pdots">'+dots+'</div></div></div>';
+h+='<div class="m-items">'+(items.length?ih:'<div style="padding:4px;color:var(--txt3);font-size:10px">لا توجد</div>')+'</div>';
+h+='<div style="padding:0 12px 8px;display:flex;gap:6px"><button class="meal-skip-btn" onclick="skipMeal(\''+k+'\')">⏭️ تخطي الكل</button><button class="meal-note-btn" onclick="togMN(\''+k+'\')">📝 ملاحظة</button></div>';
+var mn=m.note||'';if(mn)h+='<div style="padding:0 12px 8px"><input class="m-note" placeholder="ملاحظة..." value="'+mn+'" onchange="svMN(\''+k+'\',this.value)"></div>';
+h+='</div>'}
+el.innerHTML=h;uComp()}
+
+function tM(k,i){var d=gd();if(!d||!d.meals||!d.meals[k])return;var it=d.meals[k].items[i];if(!it)return;
+it.status=nextSt(it.status||'');
+if(it.status!=='swap'&&it.status!=='bad'){it.swap_note='';it.calories=0}
+sv(A);rMeals();rTM();
+var lb={done:'✅ تم',skip:'⏭️ تخطي',swap:'🔄 بديل',bad:'❌ خارج','':'↩️ إلغاء'};
+toast((lb[it.status]||'')+' '+it.name)}
+
+function mNote(k,i,field,val){var d=gd();if(!d||!d.meals||!d.meals[k])return;var it=d.meals[k].items[i];if(!it)return;
+if(field==='calories')it.calories=parseInt(val)||0;else it[field]=val;sv(A)}
+
+function skipMeal(k){var d=gd();if(!d||!d.meals||!d.meals[k])return;
+for(var i=0;i<d.meals[k].items.length;i++){d.meals[k].items[i].status='skip';d.meals[k].items[i].swap_note='';d.meals[k].items[i].calories=0}
+sv(A);rMeals();rTM();toast('⏭️ تم تخطي الوجبة')}
+
+function togMN(k){var d=gd();if(!d||!d.meals||!d.meals[k])return;
+if(!d.meals[k].note)d.meals[k].note='';else d.meals[k].note='';
+sv(A);rMeals()}
+
+function svMN(k,val){var d=gd();if(!d||!d.meals||!d.meals[k])return;d.meals[k].note=val;sv(A)}
+
+function rTM(){var d=gd(),el=document.getElementById('tMS');
+if(!d||!d.meals){el.innerHTML='';document.getElementById('cFl').style.width='0%';document.getElementById('cTx').textContent='0%';return}
+var h='<div style="display:flex;gap:4px;flex-wrap:wrap">';
+var mkeys=['breakfast','snack1','lunch','snack2','dinner'];
+for(var mi=0;mi<mkeys.length;mi++){var k=mkeys[mi];var m=d.meals[k];if(!m)continue;var items=m.items||[];
+var done=0;for(var j=0;j<items.length;j++){if(items[j].status&&items[j].status!=='')done++}
+var allDone=(done===items.length&&items.length>0);
+h+='<span style="padding:2px 6px;border-radius:20px;font-size:9px;font-weight:600;background:'+(allDone?'var(--gym-l)':'var(--bg)')+';color:'+(allDone?'var(--ok)':'var(--txt3)')+'">'+ML[k].i+' '+done+'/'+items.length+'</span>'}
+h+='</div>';el.innerHTML=h;uComp()}
+function uComp(){var d=gd();if(!d||!d.meals)return;var totalPts=0,maxPts=0,totalCal=0;
+var mkeys=['breakfast','snack1','lunch','snack2','dinner'];
+for(var mi=0;mi<mkeys.length;mi++){var k=mkeys[mi];var m=d.meals[k];
+if(!m)continue;var items=m.items||[];
+for(var j=0;j<items.length;j++){var it=items[j];
+if(it.calories)totalCal+=it.calories;
+if(!m.optional){maxPts+=100;totalPts+=stPoints(it.status||'')}}}
+var p=maxPts>0?Math.round((totalPts/maxPts)*100):0;
+document.getElementById('cFl').style.width=p+'%';document.getElementById('cTx').textContent=p+'% التزام';
+var w=gw();var budget=w?w.daily_calories||1800:1800;
+var remain=budget-totalCal;var calEl=document.getElementById('calSummary');
+if(calEl){if(totalCal>0){calEl.innerHTML='🔥 السعرات: <b>'+totalCal+'</b> / '+budget+' | المتبقي: <b style="color:'+(remain>=0?'var(--ok)':'var(--danger)')+'">'+remain+'</b>'}
+else{calEl.innerHTML='🔥 ميزانية السعرات: <b>'+budget+'</b> سعرة/يوم'}}}
 
 // WORKOUT
 function rWF(){const d=gd();if(!d)return;const t=d.workout?.treadmill||{};
@@ -574,7 +653,7 @@ const tw=A.account.target_weight;if(tw)ds.push({label:'الهدف',data:wd.map((
 ch.w=new Chart(document.getElementById('cWt'),{type:'line',data:{labels:wd.map(d=>d.l),datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:tw>0,labels:{font:{family:ff,size:9}}}},scales:{y:{grid:{color:gc}},x:{grid:{display:false},ticks:{font:{family:ff,size:9}}}}}})}
 const w=gw();if(!w)return;const dl=w.days.map(d=>d.date?adn(d.date):'يوم '+d.day_number);
 const wv=w.days.map(d=>d.water?.cups||0);ch.wa=new Chart(document.getElementById('cWa'),{type:'bar',data:{labels:dl,datasets:[{data:wv,backgroundColor:wv.map(v=>v>=(w.water_target||12)?'rgba(2,132,199,0.75)':'rgba(2,132,199,0.25)'),borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gc},suggestedMax:w.water_target||12},x:{grid:{display:false},ticks:{font:{family:ff,size:8}}}}}});
-const cv=w.days.map(d=>{if(!d.meals)return 0;let t=0,c=0;['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{(d.meals[k]?.items||[]).forEach(i=>{t++;if(i.checked)c++})});return t>0?Math.round((c/t)*100):0});
+const cv=w.days.map(d=>{if(!d.meals)return 0;let tp=0,mp=0;['breakfast','snack1','lunch','snack2','dinner'].forEach(k=>{const m=d.meals[k];if(!m||m.optional)return;(m.items||[]).forEach(i=>{mp+=100;tp+=stPoints(i.status||'')})});return mp>0?Math.round((tp/mp)*100):0});
 ch.c=new Chart(document.getElementById('cCo'),{type:'bar',data:{labels:dl,datasets:[{data:cv,backgroundColor:cv.map(v=>v>=80?'rgba(22,163,74,0.7)':v>=50?'rgba(217,119,6,0.6)':'rgba(220,38,38,0.4)'),borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gc},max:100},x:{grid:{display:false},ticks:{font:{family:ff,size:8}}}}}});
 const wkv=w.days.map(d=>d.workout?.treadmill?.duration||0);ch.wk=new Chart(document.getElementById('cWo'),{type:'line',data:{labels:dl,datasets:[{data:wkv,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,0.08)',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:'#16a34a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gc}},x:{grid:{display:false},ticks:{font:{family:ff,size:8}}}}}})}
 
@@ -591,7 +670,13 @@ const m={today:'s0',meals:'s1',workout:'s2',progress:'s3',settings:'s4'};
 document.getElementById(m[tab]).classList.add('on');document.querySelector('.nav-i[data-t="'+tab+'"]').classList.add('on');
 if(tab==='progress')rCh();if(tab==='settings')rDSm();if(tab==='meals'){rDT('dt1');rMeals()}if(tab==='workout'){rDT('dt2');rWF()}}
 
-function rAll(){rWeekArea();rDT('dt1');rDT('dt2');uW();rMeals();rTM();rTW();rWF();rMs();rProf();rChal();document.getElementById('mot').innerHTML=gMot()}
+function autoSelectToday(){
+const w=gw();if(!w)return;
+const today=ts();
+const idx=w.days.findIndex(d=>d.date===today);
+if(idx>=0&&idx!==A.currentDayIndex){A.currentDayIndex=idx;sv(A)}
+}
+function rAll(){autoSelectToday();rWeekArea();rDT('dt1');rDT('dt2');uW();rMeals();rTM();rTW();rWF();rMs();rProf();rChal();document.getElementById('mot').innerHTML=gMot()}
 
 window.addEventListener('DOMContentLoaded',()=>{if(A.account.name){document.getElementById('welc').style.display='none';show()}});
 
