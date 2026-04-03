@@ -406,6 +406,8 @@ border-radius:var(--r);border:2px dashed var(--pri);margin-bottom:10px}
 <div class="mo-f"><label>وحدة المياه</label><select id="epWU" style="width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:13px;background:var(--bg)"><option value="ml">مل ml</option><option value="cup">كوب cup</option></select></div>
 <div class="mo-f"><label>الوزن الحالي</label><input type="number" step="0.1" id="epC"></div>
 <div class="mo-f"><label>الوزن المنشود</label><input type="number" step="0.1" id="epT"></div>
+<div class="mo-f"><label>وحدة الوزن</label><select id="epWtU" style="width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:13px;background:var(--bg)"><option value="kg">كجم kg</option><option value="lb">باوند lb</option></select></div>
+<div class="mo-f"><label>وحدة الطول</label><select id="epHtU" style="width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:var(--rx);font-family:inherit;font-size:13px;background:var(--bg)"><option value="cm">سم cm</option><option value="in">إنش in</option></select></div>
 <button class="mo-go" onclick="svProf()">✅ حفظ</button><button class="mo-cl" onclick="clEP()">إغلاق</button></div></div>
 
 <!-- DELETE WEEK MODAL -->
@@ -453,9 +455,9 @@ A.account={name:n,dob:document.getElementById('rD').value||'',height:parseFloat(
 sv(A);document.getElementById('welc').classList.add('hide');setTimeout(()=>{document.getElementById('welc').style.display='none';show()},500)}
 
 // EDIT PROFILE
-function openEditProf(){const a=A.account;document.getElementById('epN').value=a.name||'';document.getElementById('epD').value=a.dob||'';document.getElementById('epH').value=a.height||'';document.getElementById('epC').value=a.current_weight||'';document.getElementById('epT').value=a.target_weight||'';document.getElementById('epWU').value=a.water_unit||'ml';document.getElementById('epM').classList.add('show')}
+function openEditProf(){const a=A.account;document.getElementById('epN').value=a.name||'';document.getElementById('epD').value=a.dob||'';document.getElementById('epH').value=a.height||'';document.getElementById('epC').value=a.current_weight||'';document.getElementById('epT').value=a.target_weight||'';document.getElementById('epWU').value=a.water_unit||'ml';document.getElementById('epWtU').value=a.weight_unit||'kg';document.getElementById('epHtU').value=a.height_unit||'cm';document.getElementById('epM').classList.add('show')}
 function clEP(){document.getElementById('epM').classList.remove('show')}
-function svProf(){A.account.name=document.getElementById('epN').value.trim()||A.account.name;A.account.dob=document.getElementById('epD').value;A.account.height=parseFloat(document.getElementById('epH').value)||0;A.account.current_weight=parseFloat(document.getElementById('epC').value)||0;A.account.target_weight=parseFloat(document.getElementById('epT').value)||0;A.account.water_unit=document.getElementById('epWU').value||'ml';sv(A);clEP();updH();rAll();toast('✅ تم حفظ الملف')}
+function svProf(){A.account.name=document.getElementById('epN').value.trim()||A.account.name;A.account.dob=document.getElementById('epD').value;A.account.height=parseFloat(document.getElementById('epH').value)||0;A.account.current_weight=parseFloat(document.getElementById('epC').value)||0;A.account.target_weight=parseFloat(document.getElementById('epT').value)||0;A.account.water_unit=document.getElementById('epWU').value||'ml';A.account.weight_unit=document.getElementById('epWtU').value||'kg';A.account.height_unit=document.getElementById('epHtU').value||'cm';sv(A);clEP();updH();rAll();toast('✅ تم حفظ الملف')}
 
 function show(){document.getElementById('hdr').style.display='flex';document.getElementById('main').style.display='block';document.getElementById('nav').style.display='flex';updH();rAll()}
 function updH(){const hr=new Date().getHours();const g=hr<12?'صباح الخير':hr<17?'مساء الخير':'مساء النور';
@@ -498,7 +500,7 @@ return{id,label:lbl||'أسبوع جديد',start_date:sd,water_target:wt||12,dai
 
 function rWS(){const s=document.getElementById('weekSel');if(!s)return;s.innerHTML='';if(!A.weeks.length){s.innerHTML='<option value="">لا توجد أسابيع</option>';return}
 A.weeks.forEach(w=>{const o=document.createElement('option');o.value=w.id;o.textContent=w.label+(w.start_date?' ('+adn(w.start_date)+' '+w.start_date+')':'');if(w.id===A.currentWeekId)o.selected=true;s.appendChild(o)})}
-function swW(v){A.currentWeekId=v;A.currentDayIndex=0;sv(A);rAll()}
+function swW(v){A.currentWeekId=v;A.currentDayIndex=0;_autoDone=false;sv(A);rAll()}
 
 function rWeekArea(){
   const wa=document.getElementById('weekArea');
@@ -670,11 +672,13 @@ const m={today:'s0',meals:'s1',workout:'s2',progress:'s3',settings:'s4'};
 document.getElementById(m[tab]).classList.add('on');document.querySelector('.nav-i[data-t="'+tab+'"]').classList.add('on');
 if(tab==='progress')rCh();if(tab==='settings')rDSm();if(tab==='meals'){rDT('dt1');rMeals()}if(tab==='workout'){rDT('dt2');rWF()}}
 
+var _autoDone=false;
 function autoSelectToday(){
-const w=gw();if(!w)return;
-const today=ts();
-const idx=w.days.findIndex(d=>d.date===today);
-if(idx>=0&&idx!==A.currentDayIndex){A.currentDayIndex=idx;sv(A)}
+if(_autoDone)return;_autoDone=true;
+var w=gw();if(!w)return;
+var today=ts();
+var idx=w.days.findIndex(function(d){return d.date===today});
+if(idx>=0){A.currentDayIndex=idx;sv(A)}
 }
 function rAll(){autoSelectToday();rWeekArea();rDT('dt1');rDT('dt2');uW();rMeals();rTM();rTW();rWF();rMs();rProf();rChal();document.getElementById('mot').innerHTML=gMot()}
 
