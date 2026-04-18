@@ -448,7 +448,7 @@ awd.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f){const dt
 function doAW(){const w=mkW(document.getElementById('awL').value.trim(),document.getElementById('awD').value||ts(),parseInt(document.getElementById('awW').value)||12,parseInt(document.getElementById('awCal').value)||1800,awI);A.weeks.push(w);A.currentWeekId=w.id;A.currentDayIndex=0;sv(A);clAW();toast(awI?'✅ تم الإنشاء مع الخطة!':'✅ تم الإنشاء!');rWS();rAll()}
 function openDelWk(){const c=document.getElementById('dwList');
 if(!A.weeks.length){c.innerHTML='<div style="text-align:center;color:var(--txt3);font-size:12px;padding:16px">لا توجد أسابيع</div>';document.getElementById('dwM').classList.add('show');return}
-let h='';A.weeks.forEach((w,i)=>{h+='<div class="del-wk-item"><div><div class="info">'+(i+1)+'. '+w.label+'</div><div class="dates">'+w.start_date+' → '+(w.days[6]?.date||'')+'</div></div><button class="del-wk-btn" onclick="doDel(''+w.id+'')">🗑️ حذف</button></div>'});
+let h='';A.weeks.forEach((w,i)=>{h+='<div class="del-wk-item"><div><div class="info">'+(i+1)+'. '+w.label+'</div><div class="dates">'+w.start_date+' → '+(w.days[6]?.date||'')+'</div></div><button class="del-wk-btn" onclick="doDel('"+w.id+"')">🗑️ حذف</button></div>'});
 c.innerHTML=h;document.getElementById('dwM').classList.add('show')}
 function clDW(){document.getElementById('dwM').classList.remove('show')}
 function doDel(id){if(!confirm('حذف هذا الأسبوع؟'))return;A.weeks=A.weeks.filter(w=>w.id!==id);if(A.currentWeekId===id){A.currentWeekId=A.weeks.length?A.weeks[A.weeks.length-1].id:null;A.currentDayIndex=0}sv(A);toast('🗑️ تم الحذف');openDelWk();rWS();rAll()}
@@ -534,13 +534,13 @@ for(var mi=0;mi<mkeys.length;mi++){var k=mkeys[mi];var m=d.meals[k];if(!m)contin
 var cc=0;for(var j=0;j<items.length;j++){if(items[j].status&&items[j].status!=='')cc++}
 var dots='';for(var j=0;j<items.length;j++){var st=items[j].status||'';dots+='<span class="dot'+((st==='done'||st==='swap'||st==='skip')?' ok':'')+'"></span>'}
 var ih='';for(var j=0;j<items.length;j++){var it=items[j];var st=it.status||'';var cls=stClass(st);var striked=(st==='done'||st==='skip');
-ih+='<div class="m-i'+(striked?' done':'')+'"><button class="m-st-btn '+cls+'" onclick="tM(''+k+'','+j+')">'+stLabel(st)+'</button><div style="flex:1"><span class="m-txt">'+it.name+'</span>';
+ih+='<div class="m-i'+(striked?' done':'')+'"><button class="m-st-btn '+cls+'" onclick="tM('"+k+"','+j+')">'+stLabel(st)+'</button><div style="flex:1"><span class="m-txt">'+it.name+'</span>';
 if(st==='swap'){ih+='<div class="m-cal"><input type="text" placeholder="البديل" value="'+(it.swap_note||'')+'" onchange="mNote(''+k+'','+j+','swap_note',this.value)"><input type="number" placeholder="cal" value="'+(it.calories||'')+'" onchange="mNote(''+k+'','+j+','calories',this.value)" style="width:50px"><span>سعرة</span></div>'}
 if(st==='bad'){ih+='<div class="m-cal"><input type="text" placeholder="إيش أكلت؟" value="'+(it.swap_note||'')+'" onchange="mNote(''+k+'','+j+','swap_note',this.value)"><input type="number" placeholder="cal" value="'+(it.calories||'')+'" onchange="mNote(''+k+'','+j+','calories',this.value)" style="width:50px"><span>سعرة</span></div>'}
 ih+='</div></div>'}
 h+='<div class="ms"><div class="ms-h"><h3>'+info.i+' '+info.a+' <span class="c-s">'+info.e+'</span></h3><div style="display:flex;align-items:center;gap:5px">'+(m.optional?'<span class="bdg opt">اختيارية</span>':'')+'<span class="bdg">'+cc+'/'+items.length+'</span><div class="pdots">'+dots+'</div></div></div>';
 h+='<div class="m-items">'+(items.length?ih:'<div style="padding:4px;color:var(--txt3);font-size:10px">لا توجد</div>')+'</div>';
-h+='<div style="padding:0 12px 8px;display:flex;gap:6px"><button class="meal-skip-btn" onclick="skipMeal(''+k+'')">⏭️ تخطي الكل</button><button class="meal-note-btn" onclick="togMN(''+k+'')">📝 ملاحظة</button></div>';
+h+='<div style="padding:0 12px 8px;display:flex;gap:6px"><button class="meal-skip-btn" onclick="skipMeal('"+k+"')"">⏭️ تخطي الكل</button><button class="meal-note-btn" onclick="togMN('"+k+"')"">📝 ملاحظة</button></div>';
 var mn=m.note||'';if(mn)h+='<div style="padding:0 12px 8px"><input class="m-note" placeholder="ملاحظة..." value="'+mn+'" onchange="svMN(''+k+'',this.value)"></div>';
 h+='</div>'}
 el.innerHTML=h;uComp()}
